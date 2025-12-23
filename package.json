@@ -1,0 +1,14 @@
+{
+  "name": "multik-bot",
+  "scripts": {
+    "dev": "bun run --hot api/index.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.89.0",
+    "grammy": "^1.38.4",
+    "hono": "^4.11.1"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
