@@ -78,7 +78,7 @@ bot.command("start", async (ctx) => {
 
 bot.on("message:text", async (ctx) => {
     try {
-        if (/^[mM]\d+$/.test(ctx.message.text)) {
+        if (/^[M]\d+$/.test(ctx.message.text)) {
             const code = ctx.message.text;
 
             const isFound = await sendMovie(code, ctx);
