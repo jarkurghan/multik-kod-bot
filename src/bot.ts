@@ -43,7 +43,7 @@ const sendMovie = async (code: string, ctx: Context) => {
         const { data: movie } = await supabase.from(TABLE_NAME).select("*").eq("code", code).maybeSingle();
         if (!movie) return false;
 
-        const posts = movie.post.split(",");
+        const posts = movie.posts.split(",");
 
         for (let i = 0; i < posts.length; i++) {
             await ctx.api.copyMessage(chat, CHANNEL, posts[i]);
@@ -56,30 +56,37 @@ const sendMovie = async (code: string, ctx: Context) => {
 };
 
 bot.command("start", async (ctx) => {
-    const payload = ctx.match;
-    const utm = payload.slice(payload.indexOf("utm-") + 4);
+    try {
+        const payload = ctx.match;
+        const utm = payload.slice(payload.indexOf("utm-") + 4);
 
-    await saveUser(ctx, { utm });
+        await saveUser(ctx, { utm });
 
-    if (payload && payload.slice(0, 5) === "mcode") {
-        const code = payload.slice(12);
+        if (payload && payload.slice(0, 5) === "mcode") {
+            const code = payload.slice(12);
 
-        const isFound = await sendMovie(code, ctx);
-        if (!isFound) await ctx.reply("❌ Topilmadi!");
-        return;
+            const isFound = await sendMovie(code, ctx);
+            if (!isFound) await ctx.reply("❌ Topilmadi!");
+            return;
+        }
+
+        await ctx.reply("Salom! Qanday multfilm qidiryapsiz!");
+    } catch (error) {
+        console.log(error);
     }
-
-    await ctx.reply("Salom! Qanday multfilm qidiryapsiz!");
 });
 
 bot.on("message:text", async (ctx) => {
-    if (/^[mM]\d+$/.test(ctx.message.text)) {
-        const code = ctx.message.text;
+    try {
+        if (/^[mM]\d+$/.test(ctx.message.text)) {
+            const code = ctx.message.text;
 
-        const isFound = await sendMovie(code, ctx);
-        if (isFound) return;
-    } else {
+            const isFound = await sendMovie(code, ctx);
+            if (isFound) return;
+        }
         await ctx.reply("❌ Topilmadi!\nMultfilm kodini to'g'riligiga ishonchingiz komilmi :)");
+    } catch (error) {
+        console.log(error);
     }
 });
 
