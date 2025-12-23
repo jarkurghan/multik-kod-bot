@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
-import { handleUpdate } from "../src/bot";
+import { handleUpdate } from "./bot";
 
 const app = new Hono();
 
