@@ -63,7 +63,7 @@ bot.command("start", async (ctx) => {
         await saveUser(ctx, { utm });
 
         if (payload && payload.slice(0, 5) === "mcode") {
-            const code = payload.slice(12);
+            const code = payload.slice(6);
 
             const isFound = await sendMovie(code, ctx);
             if (!isFound) await ctx.reply("❌ Topilmadi!");
@@ -78,7 +78,7 @@ bot.command("start", async (ctx) => {
 
 bot.on("message:text", async (ctx) => {
     try {
-        if (/^[M]\d+$/.test(ctx.message.text)) {
+        if (/^[M][\d\-_]+$/i.test(ctx.message.text)) {
             const code = ctx.message.text;
 
             const isFound = await sendMovie(code, ctx);
