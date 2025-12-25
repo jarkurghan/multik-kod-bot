@@ -24,11 +24,12 @@ async function saveUser(ctx: Context, prop: { utm?: string }) {
             const utm = prop.utm || "-";
             const message =
                 `🆕 Yangi foydalanuvchi:\n\n👤 Ism: ${user.first_name || "Noma'lum"} ${user.last_name || ""}\n🔗 Username:` +
-                ` ${user.username ? `@${user.username}` : "Noma'lum"}\n🆔 ID: ${user.id}\n🚪 UTM: ${utm}\n🤖 Bot: @insta_yuklagich_bot`;
+                ` ${user.username ? `@${user.username}` : "Noma'lum"}\n🆔 ID: ${user.id}\n🚪 UTM: ${utm}\n🤖 Bot: @uz_multfilm_bot`;
             await bot.api.sendMessage(ADMIN_CHAT, message);
 
             await ctx.reply("Assalom alaykum!\nUshbu bot @uzbek_tilida_multfilm kanalidagi kodlar asosida multfilm topib berish uchun mo'ljallangan");
         }
+        await ctx.replyWithChatAction("typing");
 
         const { error } = await supabase.from(USER_TABLE_NAME).upsert(userData, { onConflict: "tg_id" }).select("*");
         if (error) console.error("Supabasega saqlashda xato:", error);
@@ -63,18 +64,21 @@ bot.command("start", async (ctx) => {
         await ctx.replyWithChatAction("typing");
 
         const payload = ctx.match;
-        const utm = payload.slice(payload.indexOf("utm-") + 4);
+        const utm = payload.includes("mcode") ? "channel" : payload.includes("utm-") ? payload.slice(payload.indexOf("utm-") + 4) : "";
         await saveUser(ctx, { utm });
 
         if (payload && payload.slice(0, 5).toLowerCase() === "mcode") {
             const code = payload.slice(6);
 
             const isFound = await sendMovie(code, ctx);
-            if (!isFound) await ctx.reply("❌ Topilmadi!");
+            if (!isFound) await ctx.reply("❌ Topilmadi!", { reply_parameters: { message_id: ctx.msg.message_id } });
             return;
         }
 
-        await ctx.reply("Qanday multfilm qidiryapsiz!");
+        const message =
+            `Multfilm kodini yozing va men sizga multfilmni yuboraman!\n\n` +
+            "<blockquote>Multfilmlar kodlarini ko'rish uchun @uzbek_tilida_multfilm kanaliga o'ting</blockquote>";
+        await ctx.reply(message, { parse_mode: "HTML" });
     } catch (error) {
         console.log(error);
     }
@@ -82,15 +86,17 @@ bot.command("start", async (ctx) => {
 
 bot.on("message:text", async (ctx) => {
     try {
-        await ctx.replyWithChatAction("typing");
+        if (ctx.chat.type === "private") {
+            await ctx.replyWithChatAction("typing");
 
-        if (/^[M][\d\-_]+$/i.test(ctx.message.text)) {
-            const code = ctx.message.text.toUpperCase();
+            if (/^[M][\d\-_]+$/i.test(ctx.message.text)) {
+                const code = ctx.message.text.toUpperCase();
 
-            const isFound = await sendMovie(code, ctx);
-            if (isFound) return;
+                const isFound = await sendMovie(code, ctx);
+                if (isFound) return;
+            }
+            await ctx.reply("❌ Topilmadi!\nMultfilm kodi to'g'riligiga ishonchingiz komilmi :)", { reply_parameters: { message_id: ctx.msg.message_id } });
         }
-        await ctx.reply("❌ Topilmadi!\nMultfilm kodi to'g'riligiga ishonchingiz komilmi :)");
     } catch (error) {
         console.log(error);
     }
