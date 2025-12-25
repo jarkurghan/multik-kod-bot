@@ -26,6 +26,8 @@ async function saveUser(ctx: Context, prop: { utm?: string }) {
                 `🆕 Yangi foydalanuvchi:\n\n👤 Ism: ${user.first_name || "Noma'lum"} ${user.last_name || ""}\n🔗 Username:` +
                 ` ${user.username ? `@${user.username}` : "Noma'lum"}\n🆔 ID: ${user.id}\n🚪 UTM: ${utm}\n🤖 Bot: @insta_yuklagich_bot`;
             await bot.api.sendMessage(ADMIN_CHAT, message);
+
+            await ctx.reply("Assalom alaykum!\nUshbu bot @uzbek_tilida_multfilm kanalidagi kodlar asosida multfilm topib berish uchun mo'ljallangan");
         }
 
         const { error } = await supabase.from(USER_TABLE_NAME).upsert(userData, { onConflict: "tg_id" }).select("*");
@@ -43,8 +45,9 @@ const sendMovie = async (code: string, ctx: Context) => {
         const { data: movie } = await supabase.from(TABLE_NAME).select("*").eq("code", code).maybeSingle();
         if (!movie) return false;
 
-        const posts = movie.posts.split(",");
+        await ctx.replyWithChatAction("upload_video");
 
+        const posts = movie.posts.split(",");
         for (let i = 0; i < posts.length; i++) {
             await ctx.api.copyMessage(chat, CHANNEL, posts[i]);
         }
@@ -57,12 +60,13 @@ const sendMovie = async (code: string, ctx: Context) => {
 
 bot.command("start", async (ctx) => {
     try {
+        await ctx.replyWithChatAction("typing");
+
         const payload = ctx.match;
         const utm = payload.slice(payload.indexOf("utm-") + 4);
-
         await saveUser(ctx, { utm });
 
-        if (payload && payload.slice(0, 5) === "mcode") {
+        if (payload && payload.slice(0, 5).toLowerCase() === "mcode") {
             const code = payload.slice(6);
 
             const isFound = await sendMovie(code, ctx);
@@ -70,7 +74,7 @@ bot.command("start", async (ctx) => {
             return;
         }
 
-        await ctx.reply("Salom! Qanday multfilm qidiryapsiz!");
+        await ctx.reply("Qanday multfilm qidiryapsiz!");
     } catch (error) {
         console.log(error);
     }
@@ -78,13 +82,15 @@ bot.command("start", async (ctx) => {
 
 bot.on("message:text", async (ctx) => {
     try {
+        await ctx.replyWithChatAction("typing");
+
         if (/^[M][\d\-_]+$/i.test(ctx.message.text)) {
-            const code = ctx.message.text;
+            const code = ctx.message.text.toUpperCase();
 
             const isFound = await sendMovie(code, ctx);
             if (isFound) return;
         }
-        await ctx.reply("❌ Topilmadi!\nMultfilm kodini to'g'riligiga ishonchingiz komilmi :)");
+        await ctx.reply("❌ Topilmadi!\nMultfilm kodi to'g'riligiga ishonchingiz komilmi :)");
     } catch (error) {
         console.log(error);
     }
