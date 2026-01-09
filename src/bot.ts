@@ -6,6 +6,7 @@ import { ADMIN_CHAT } from "./constants";
 import { TABLE_NAME } from "./constants";
 import { BOT_TOKEN } from "./constants";
 import { CHANNEL } from "./constants";
+import { LOG_CHAT } from "./constants";
 import { supabase } from "./supabase";
 import { User } from "./types";
 
@@ -71,7 +72,13 @@ bot.command("start", async (ctx) => {
             const code = payload.slice(6);
 
             const isFound = await sendMovie(code, ctx);
-            if (!isFound) await ctx.reply("❌ Topilmadi!", { reply_parameters: { message_id: ctx.msg.message_id } });
+            if (!isFound) {
+                await ctx.reply("❌ Topilmadi!", { reply_parameters: { message_id: ctx.msg.message_id } });
+
+                const forwardedLog = await ctx.forwardMessage(LOG_CHAT);
+                const reply_to_message_id = forwardedLog.message_id;
+                await bot.api.sendMessage(LOG_CHAT, code, { reply_to_message_id });
+            }
             return;
         }
 
@@ -95,10 +102,20 @@ bot.on("message:text", async (ctx) => {
                 const isFound = await sendMovie(code, ctx);
                 if (isFound) return;
             }
+
             await ctx.reply("❌ Topilmadi!\nMultfilm kodi to'g'riligiga ishonchingiz komilmi :)", { reply_parameters: { message_id: ctx.msg.message_id } });
+            await ctx.forwardMessage(LOG_CHAT);
         }
     } catch (error) {
         console.log(error);
+
+        const forwardedLog = await ctx.forwardMessage(LOG_CHAT);
+        const reply_to_message_id = forwardedLog.message_id;
+        if (error instanceof Error) {
+            await bot.api.sendMessage(LOG_CHAT, error.message, { reply_to_message_id });
+        } else {
+            await bot.api.sendMessage(LOG_CHAT, `Xato: ${error}`, { reply_to_message_id });
+        }
     }
 });
 
