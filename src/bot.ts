@@ -103,7 +103,7 @@ bot.on("message:text", async (ctx) => {
                 if (isFound) return;
             }
 
-            const example = "<blockquote>Masalan, hayvonlar shahri 2 multfilm kodi - <b>M319<b></blockquote>";
+            const example = "<blockquote>Masalan, hayvonlar shahri 2 multfilm kodi - <b>M319</b></blockquote>";
             await ctx.reply("❌ Topilmadi!\nMultfilm kodi to'g'riligiga ishonchingiz komilmi :)\n\n" + example, {
                 parse_mode: "HTML",
                 reply_parameters: { message_id: ctx.msg.message_id },
