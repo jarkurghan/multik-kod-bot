@@ -1,12 +1,16 @@
 import { Hono } from "hono";
-import { handle } from "hono/vercel";
-import { handleUpdate } from "./bot";
+import { handleUpdate } from "@/bot.ts";
+import { logger } from "hono/logger";
 
 const app = new Hono();
 
-app.post("/bot", async (c) => await handleUpdate(c));
-app.get("/", (c) => c.text("Hello Hono!"));
+app.use("*", logger());
 
-export const config = { runtime: "edge" };
-export const POST = handle(app);
-export const GET = handle(app);
+app.get("/", (c) => c.text("Hello Hono!"));
+app.post("/bot", handleUpdate);
+
+export default app;
+
+// import { startBot } from "@/bot.ts";
+
+// startBot();
