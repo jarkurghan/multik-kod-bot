@@ -21,7 +21,7 @@ export async function botStart(ctx: Context) {
         if (!user) return;
 
         if (payloadObj.mcode) {
-            const code = payloadObj.mcode;
+            const code = payloadObj.mcode.toUpperCase();
 
             const isFound = await sendMovie(code, ctx);
             if (!isFound) {
