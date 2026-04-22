@@ -1,6 +1,6 @@
 import type { Context } from "grammy";
 
-import { resolveUtmFromStartPayload } from "@/services/start-payload.ts";
+import { findUtm, objPayload } from "@/services/start-payload.ts";
 import { getStartPayload } from "@/services/start-payload.ts";
 import { sendMovie } from "@/services/send-movie";
 import { saveUser } from "@/services/save-user";
@@ -14,13 +14,14 @@ export async function botStart(ctx: Context) {
         await ctx.replyWithChatAction("typing");
 
         const payload = getStartPayload(ctx);
+        const payloadObj = objPayload(payload);
 
-        const utm = resolveUtmFromStartPayload(payload);
+        const utm = findUtm(payloadObj);
         const [user] = await saveUser(ctx, { utm });
         if (!user) return;
 
-        if (payload.slice(0, 5).toLowerCase() === "mcode") {
-            const code = payload.slice(6);
+        if (payloadObj.mcode) {
+            const code = payloadObj.mcode;
 
             const isFound = await sendMovie(code, ctx);
             if (!isFound) {
