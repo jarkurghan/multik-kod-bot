@@ -23,6 +23,8 @@ export const movie = pgTable("movie", {
     id: serial("id").primaryKey(),
     code: text("code").notNull().unique(),
     posts: text("posts").notNull(),
+    channel_posts: text("channel_posts"),
+    imdb_id: text("imdb_id"),
     description: text("description"),
     today_count: integer("today_count").default(0).notNull(),
     total_count: integer("total_count").default(0).notNull(),
