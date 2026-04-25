@@ -30,3 +30,15 @@ export const movie = pgTable("movie", {
     total_count: integer("total_count").default(0).notNull(),
     created_at: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const reserve = pgTable("reserve", {
+    id: serial("id").primaryKey(),
+    name: text("name"),
+    code: text("code").unique(),
+    description: text("description"),
+    imdb_url: text("imdb_url"),
+    imdb_info: text("imdb_info"),
+    imdb_plot: text("imdb_plot"),
+    items: text("items"),
+    created_at: timestamp("created_at").defaultNow().notNull(),
+});
