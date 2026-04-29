@@ -29,6 +29,7 @@ export function findUtm(obj: { [key: string]: string }): string {
     const utm = obj.utm;
     if (!utm) return "";
     else if (utm === "karyera") return "@meni_botlarim";
+    else if (utm.includes("aniuzbot")) return "@aniuz_bot";
     else return utm;
 }
 
@@ -39,6 +40,7 @@ export function resolveUtmFromStartPayload(startPayload: string): string {
     if (p.includes("utm-")) {
         const utm = p.slice(p.indexOf("utm-") + 4);
         if (utm.includes("karyera")) return "@meni_botlarim";
+        else if (utm.includes("aniuzbot")) return "@aniuz_bot";
         else return utm;
     }
 
