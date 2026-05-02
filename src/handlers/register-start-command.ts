@@ -27,6 +27,8 @@ export async function botStart(ctx: Context) {
 
             const isFound = await sendMovie(code, ctx);
             if (!isFound) {
+                console.log(isFound);
+                
                 await ctx.reply("❌ Topilmadi!", { reply_parameters: { message_id: ctx.msg.message_id } });
 
                 const forwardedLog = await ctx.forwardMessage(LOG_CHANNEL_ID);
