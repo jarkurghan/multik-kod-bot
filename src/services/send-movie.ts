@@ -6,7 +6,7 @@ import { counter } from "@/services/counter";
 import { CHANNEL } from "@/utils/constants";
 import { movie } from "@/db/schema";
 
-export const sendMovie = async (code: string, ctx: Context) => {
+export const sendMovie = async (code: string, ctx: Context, post_id?: number) => {
     try {
         const chat = ctx.chat?.id ?? ctx.message?.chat?.id ?? ctx.from?.id;
         if (!chat) return false;
@@ -17,10 +17,16 @@ export const sendMovie = async (code: string, ctx: Context) => {
         await ctx.replyWithChatAction("upload_video");
 
         const posts = data.posts.split(",");
-        for (let i = 0; i < posts.length; i++) {
-            await ctx.api.copyMessage(chat, CHANNEL, Number(posts[i]));
+        const post = posts.find((e) => e === String(post_id));
+        if (post) {
+            await ctx.api.copyMessage(chat, CHANNEL, Number(post));
+            await counter(ctx, data.id, 1);
+        } else {
+            for (let i = 0; i < posts.length; i++) {
+                await ctx.api.copyMessage(chat, CHANNEL, Number(posts[i]));
+            }
+            await counter(ctx, data.id, posts.length);
         }
-        await counter(ctx, data.id, posts.length);
 
         return true;
     } catch (error) {

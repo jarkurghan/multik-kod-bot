@@ -21,14 +21,12 @@ export async function botStart(ctx: Context) {
         if (!user) return;
 
         if (payloadObj.mcode) {
-            console.log(payloadObj);
+            console.log(JSON.stringify(payloadObj));
 
             const code = payloadObj.mcode.toUpperCase();
 
-            const isFound = await sendMovie(code, ctx);
+            const isFound = await sendMovie(code, ctx, Number(payloadObj.post));
             if (!isFound) {
-                console.log("isFound", isFound);
-                
                 await ctx.reply("❌ Topilmadi!", { reply_parameters: { message_id: ctx.msg.message_id } });
 
                 const forwardedLog = await ctx.forwardMessage(LOG_CHANNEL_ID);
