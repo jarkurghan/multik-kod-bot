@@ -1,6 +1,7 @@
 import type { Context, Filter } from "grammy";
 
 import { LOG_CHANNEL_ID } from "@/utils/constants";
+import { getRandomMovieExample } from "@/services/random-movie-example";
 import { sendMovie } from "@/services/send-movie";
 import { sendErrorLog } from "@/services/log";
 
@@ -16,7 +17,7 @@ export const search = async (ctx: Filter<Context, "message:text">) => {
                 if (isFound) return;
             }
 
-            const example = "<blockquote>Masalan, hayvonlar shahri 2 multfilm kodi - <b>M319</b></blockquote>";
+            const example = await getRandomMovieExample();
             await ctx.reply("❌ Topilmadi!\nMultfilm kodi to'g'riligiga ishonchingiz komilmi :)\n\n" + example, {
                 parse_mode: "HTML",
                 reply_parameters: { message_id: ctx.msg.message_id },
