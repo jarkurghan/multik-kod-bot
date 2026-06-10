@@ -14,6 +14,7 @@ export const descToJson = (description: string | null) => {
               .trim()
               .split("#")
               .map((e) => e.trim())
+              .slice(1)
         : undefined;
 
     const duration1 = infoArr.find((e) => e.includes("Davomiyligi"));
