@@ -26,3 +26,9 @@ export const mostWatchedMoviesToday = async (c: Context) => {
     const data = movies.map((e) => ({ ...e, ...descToJson(e.description), description: undefined }));
     return c.json({ page, limit, data });
 };
+
+export const mostWatchedMovieToday = async (c: Context) => {
+    const movies = await db.select().from(movie).where(notLike(movie.code, "%N%")).orderBy(desc(movie.today_count)).limit(1);
+    const data = movies.map((e) => ({ ...e, ...descToJson(e.description), description: undefined }));
+    return c.json({ page: 1, limit: 1, data });
+};
