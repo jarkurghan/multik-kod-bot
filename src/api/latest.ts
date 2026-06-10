@@ -2,6 +2,7 @@ import { type Context } from "hono";
 import { movie } from "@/db/schema";
 import { desc, notIlike } from "drizzle-orm";
 import { db } from "@/db/client";
+import { descToJson } from "@/utils/parser";
 
 export const latestMovies = async (c: Context) => {
     const page = Math.max(1, Number(c.req.query("page") ?? 1));
@@ -10,5 +11,6 @@ export const latestMovies = async (c: Context) => {
 
     const movies = await db.select().from(movie).where(notIlike(movie.code, "n")).orderBy(desc(movie.created_at)).limit(limit).offset(offset);
 
-    return c.json({ page, limit, data: movies });
+    const data = movies.map((e) => ({ ...e, ...descToJson(e.description), description: undefined }));
+    return c.json({ page, limit, data });
 };
