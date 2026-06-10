@@ -1,7 +1,7 @@
 import { type Context } from "hono";
 import { descToJson } from "@/utils/parser";
 import { inArray, like, notLike } from "drizzle-orm";
-import { movie } from "@/db/schema";
+import { mbu, movie } from "@/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { bot } from "@/bot";
@@ -48,6 +48,22 @@ export const sendMovie = async (c: Context) => {
     for (const post of posts) {
         await bot.api.copyMessage(chat_id, CHANNEL, Number(post));
     }
+
+    const step = posts.length;
+
+    const userWhere = eq(mbu.tg_id, chat_id);
+    const [user] = await db.select().from(mbu).where(userWhere).limit(1);
+    if (user) {
+        await db
+            .update(mbu)
+            .set({ today_count: user.today_count + step, total_count: user.total_count + step })
+            .where(userWhere);
+    }
+
+    await db
+        .update(movie)
+        .set({ today_count: data.today_count + step, total_count: data.total_count + step })
+        .where(eq(movie.id, data.id));
 
     return c.json({ ok: true });
 };
