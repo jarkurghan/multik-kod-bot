@@ -2,6 +2,8 @@ export const descToJson = (description: string | null) => {
     const [title, info, plot] = (description || "\n\n\n\n").split("\n\n");
     const infoArr = info.split("\n");
 
+    console.log(info);
+    
     const year = infoArr
         .find((e) => e.includes("Yil"))!
         .split(":")[1]
