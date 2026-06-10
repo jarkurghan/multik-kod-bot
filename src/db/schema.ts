@@ -29,6 +29,10 @@ export const movie = pgTable("movie", {
     today_count: integer("today_count").default(0).notNull(),
     total_count: integer("total_count").default(0).notNull(),
     created_at: timestamp("created_at").defaultNow().notNull(),
+    updated_at: timestamp("updated_at")
+        .defaultNow()
+        .notNull()
+        .$onUpdate(() => new Date()),
 });
 
 export const reserve = pgTable("reserve", {
