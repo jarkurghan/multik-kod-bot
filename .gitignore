@@ -1,7 +1,5 @@
 node_modules/
-web/node_modules/
 dist/
-web-dist/
 package-lock.json
 
 drizzle/
