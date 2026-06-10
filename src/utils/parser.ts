@@ -3,32 +3,28 @@ export const descToJson = (description: string | null) => {
     const infoArr = info.split("\n");
 
     console.log(info);
-    
-    const year = infoArr
-        .find((e) => e.includes("Yil"))!
-        .split(":")[1]
-        .trim();
 
-    const genres = infoArr
-        .find((e) => e.includes("Janr"))!
-        .split(":")[1]
-        .trim()
-        .split("#")
-        .map((e) => e.trim());
+    const year1 = infoArr.find((e) => e.includes("Yil"));
+    const year = year1 ? year1.split(":")[1].trim() : undefined;
 
-    const duration = infoArr
-        .find((e) => e.includes("Davomiyligi"))!
-        .split(":")[1]
-        .trim();
+    const genres1 = infoArr.find((e) => e.includes("Janr"));
+    const genres = genres1
+        ? genres1
+              .split(":")[1]
+              .trim()
+              .split("#")
+              .map((e) => e.trim())
+        : undefined;
 
-    const irating = infoArr
-        .find((e) => e.includes("IMDb reyting"))!
-        .split(":")[1]
-        .trim();
+    const duration1 = infoArr.find((e) => e.includes("Davomiyligi"));
+    const duration = duration1 ? duration1.split(":")[1].trim() : undefined;
 
-    const match = irating.match(/^([\d.]+)\s*\((\d+)\s+ovoz\)$/);
-    const rating = match![1];
-    const vote = match![2];
+    const irating1 = infoArr.find((e) => e.includes("IMDb reyting"));
+    const irating = irating1 ? irating1.split(":")[1].trim() : undefined;
+
+    const match = irating?.match(/^([\d.]+)\s*\((\d+)\s+ovoz\)$/);
+    const rating = match && match[1] ? match[1] : undefined;
+    const vote = match && match[2] ? match[2] : undefined;
 
     return { title, info, plot, year, rating, vote, genres, duration };
 };
