@@ -2,8 +2,21 @@ import { type Context } from "hono";
 import { descToJson } from "@/utils/parser";
 import { inArray, like, notLike } from "drizzle-orm";
 import { movie } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { desc, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+
+export const seriesEpisodes = async (c: Context) => {
+    const code = c.req.param("code").toUpperCase();
+
+    const episodes = await db
+        .select()
+        .from(movie)
+        .where(like(movie.code, `${code}N%`))
+        .orderBy(sql`CAST(SPLIT_PART(${movie.code}, 'N', 2) AS INTEGER)`);
+
+    const data = episodes.map((e) => ({ ...e, ...descToJson(e.description), description: undefined }));
+    return c.json({ data });
+};
 
 export const seriesList = async (c: Context) => {
     const page = Math.max(1, Number(c.req.query("page") ?? 1));
