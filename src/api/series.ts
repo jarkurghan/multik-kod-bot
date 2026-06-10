@@ -2,8 +2,10 @@ import { type Context } from "hono";
 import { descToJson } from "@/utils/parser";
 import { inArray, like, notLike } from "drizzle-orm";
 import { movie } from "@/db/schema";
-import { desc, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import { bot } from "@/bot";
+import { CHANNEL } from "@/utils/constants";
 
 export const seriesEpisodes = async (c: Context) => {
     const code = c.req.param("code").toUpperCase();
@@ -30,4 +32,22 @@ export const seriesList = async (c: Context) => {
 
     const data = series.map((e) => ({ ...e, ...descToJson(e.description), description: undefined }));
     return c.json({ page, limit, data });
+};
+
+export const sendMovie = async (c: Context) => {
+    const code = c.req.param("code").toUpperCase();
+    const chat_id = c.req.param("chat_id");
+
+    const [data] = await db.select().from(movie).where(eq(movie.code, code)).limit(1);
+    if (!data) {
+        await bot.api.sendMessage(chat_id, "❌ Topilmadi!");
+        return c.json({ ok: false });
+    }
+
+    const posts = data.posts.split(",");
+    for (const post of posts) {
+        await bot.api.copyMessage(chat_id, CHANNEL, Number(post));
+    }
+
+    return c.json({ ok: true });
 };
