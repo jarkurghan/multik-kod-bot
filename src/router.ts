@@ -12,6 +12,6 @@ router.get("/list/latest/view", latestViews);
 router.get("/list/most-watched", mostWatchedMovies);
 router.get("/list/most-watched/today", mostWatchedMoviesToday);
 router.get("/list/most-watched/today/1", mostWatchedMovieToday);
-router.get("/list/send/:code/:chat_id", sendMovie);
+router.get("/send/:code/:chat_id", sendMovie);
 
 export { router };
