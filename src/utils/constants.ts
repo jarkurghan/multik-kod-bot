@@ -6,6 +6,9 @@ export const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "";
 export const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID || "";
 export const CHANNEL = process.env.CHANNEL_ID || "";
 
+export const BROADCAST_PRIVATE_CHAT_ID = process.env.BROADCAST_PRIVATE_CHAT_ID || "";
+export const BROADCAST_CHANNEL_ID = process.env.BROADCAST_CHANNEL_ID || "";
+
 export const DB_HOST = process.env.DB_HOST || "";
 export const DB_PORT = process.env.DB_PORT || "";
 export const DB_USER = process.env.DB_USER || "";

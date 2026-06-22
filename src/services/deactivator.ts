@@ -1,5 +1,5 @@
 import type { Context } from "grammy";
-import type { UserStatus } from "@/utils/types.ts";
+import type { User, UserStatus } from "@/utils/types.ts";
 
 import { sendLog } from "@/services/log.ts";
 import { userLink } from "@/services/save-user.ts";
@@ -38,5 +38,35 @@ export async function changeStatus(ctx: Context, status: UserStatus) {
         }
     } catch (error) {
         await sendErrorLog({ ctx, event: "Status o'zgartirishda", error });
+    }
+}
+
+export async function changeStatus2(user: User, status: UserStatus): Promise<void> {
+    const { tg_id } = user;
+    const userlink = userLink(user);
+
+    try {
+        const whereCondition = eq(mbu.tg_id, String(tg_id));
+        const [updated] = await db.update(mbu).set({ status }).where(whereCondition).returning();
+
+        if (!updated) {
+            const msg =
+                `❗️ <b>Xato:</b>\n\n` +
+                `🔦 Tafsilot: Status o'zgartirilmadi (foydalanuvchi topilmadi)\n` +
+                `🆔 User ID: <code>${tg_id}</code>\n` +
+                `👤 User: ${userlink}`;
+
+            await sendLog(msg);
+        } else {
+            const msg =
+                `♻️ Status o'zgartirildi:\n\n` +
+                `👤 Ism: ${userlink}\n` +
+                `🆔 User ID: <code>${tg_id}</code>\n` +
+                `🔦 Yangi status: ${status}\n` +
+                `🤖 Bot: @uz_multfilm_bot`;
+            await sendAdmin(msg);
+        }
+    } catch (error) {
+        await sendErrorLog({ event: "Status o'zgartirish jarayonida xatolik yuz berdi", error });
     }
 }
