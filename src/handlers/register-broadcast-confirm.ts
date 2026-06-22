@@ -27,7 +27,7 @@ export async function broadcastConfirm(ctx: Filter<Context, "callback_query:data
             await ctx.answerCallbackQuery("Broadcast boshlanmoqda...");
             await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } });
 
-            const { sent, failed } = await broadcastToAllUsers(pending.channelChatId, pending.channelMessageId);
+            const { sent, failed } = await broadcastToAllUsers(pending.channelChatId, pending.channelMessageId, pending.replyMarkup);
             setPendingBroadcast(null);
 
             const summary =

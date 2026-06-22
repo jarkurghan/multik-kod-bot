@@ -1,4 +1,10 @@
-type PendingBroadcast = { channelMessageId: number; channelChatId: string } | null;
+import type { InlineKeyboardMarkup } from "grammy/types";
+
+type PendingBroadcast = {
+    channelMessageId: number;
+    channelChatId: string;
+    replyMarkup?: InlineKeyboardMarkup;
+} | null;
 
 let pendingBroadcast: PendingBroadcast = null;
 

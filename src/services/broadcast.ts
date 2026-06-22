@@ -8,7 +8,7 @@ import { mbu } from "@/db/schema";
 import { db } from "@/db/client";
 import { eq } from "drizzle-orm";
 
-export const broadcastToAllUsers = async (fromChatId: string | number, messageId: number) => {
+export const broadcastToAllUsers = async (fromChatId: string | number, messageId: number, replyMarkup?: import("grammy/types").InlineKeyboardMarkup) => {
     const allUsers = await db.select().from(mbu).where(eq(mbu.status, "active"));
 
     let sent = 0;
@@ -16,7 +16,7 @@ export const broadcastToAllUsers = async (fromChatId: string | number, messageId
 
     for (const user of allUsers) {
         try {
-            await bot.api.copyMessage(user.tg_id, fromChatId, messageId);
+            await bot.api.copyMessage(user.tg_id, fromChatId, messageId, { reply_markup: replyMarkup });
             sent++;
         } catch (error) {
             failed++;
