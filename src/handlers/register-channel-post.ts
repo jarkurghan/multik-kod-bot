@@ -16,7 +16,12 @@ export async function channelPost(ctx: Filter<Context, "channel_post">) {
 
         await bot.api.sendMessage(BROADCAST_PRIVATE_CHAT_ID, "📢 Bu reklamani barcha foydalanuvchilarga broadcast qilaymi?", {
             reply_parameters: { message_id: copied.message_id },
-            reply_markup: { keyboard: [[{ text: "Ha" }, { text: "Yo'q" }]], resize_keyboard: true, one_time_keyboard: true },
+            reply_markup: {
+                inline_keyboard: [[
+                    { text: "✅ Ha", callback_data: "broadcast:ha" },
+                    { text: "❌ Yo'q", callback_data: "broadcast:yoq" },
+                ]],
+            },
         });
 
         setPendingBroadcast({ channelMessageId: messageId, channelChatId: chatId });

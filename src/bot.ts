@@ -13,10 +13,10 @@ export const bot = new Bot(BOT_TOKEN);
 
 bot.command("start", botStart);
 
-bot.on("channel_post", channelPost);
-bot.on("message:text", broadcastConfirm);
 bot.on("message:text", search);
 bot.on("my_chat_member", registerChatMember);
+bot.on("callback_query:data", broadcastConfirm);
+bot.on("channel_post", channelPost);
 
 bot.catch(errorHandler);
 

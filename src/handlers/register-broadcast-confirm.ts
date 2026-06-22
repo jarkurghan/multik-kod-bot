@@ -1,23 +1,31 @@
-import type { Context, NextFunction } from "grammy";
+import type { Context, Filter, NextFunction } from "grammy";
 
+import { bot } from "@/bot";
 import { BROADCAST_CHANNEL_ID, BROADCAST_PRIVATE_CHAT_ID } from "@/utils/constants";
 import { getPendingBroadcast, setPendingBroadcast } from "@/state/broadcast";
 import { broadcastToAllUsers } from "@/services/broadcast";
 import { sendErrorLog } from "@/services/log";
-import { bot } from "@/bot";
 
-export async function broadcastConfirm(ctx: Context, next: NextFunction) {
+export async function broadcastConfirm(ctx: Filter<Context, "callback_query:data">, next: NextFunction) {
     try {
-        if (ctx.chat?.type !== "private") return next();
-        if (String(ctx.from?.id) !== BROADCAST_PRIVATE_CHAT_ID) return next();
+        if (!ctx.callbackQuery.data.startsWith("broadcast:")) return next();
 
-        const text = ctx.message?.text;
+        if (String(ctx.from.id) !== BROADCAST_PRIVATE_CHAT_ID) {
+            await ctx.answerCallbackQuery("Sizga ruxsat yo'q");
+            return;
+        }
+
         const pending = getPendingBroadcast();
+        if (!pending) {
+            await ctx.answerCallbackQuery("Aktiv broadcast topilmadi");
+            return;
+        }
 
-        if (!pending || (text !== "Ha" && text !== "Yo'q")) return next();
+        const action = ctx.callbackQuery.data.split(":")[1];
 
-        if (text === "Ha") {
-            await ctx.reply("⏳ Broadcast boshlanmoqda...", { reply_markup: { remove_keyboard: true } });
+        if (action === "ha") {
+            await ctx.answerCallbackQuery("Broadcast boshlanmoqda...");
+            await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } });
 
             const { sent, failed } = await broadcastToAllUsers(pending.channelChatId, pending.channelMessageId);
             setPendingBroadcast(null);
@@ -31,8 +39,10 @@ export async function broadcastConfirm(ctx: Context, next: NextFunction) {
             await bot.api.sendMessage(BROADCAST_CHANNEL_ID, summary, { reply_parameters: { message_id: pending.channelMessageId } });
             await ctx.reply(summary);
         } else {
+            await ctx.answerCallbackQuery("Bekor qilindi");
+            await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } });
+
             setPendingBroadcast(null);
-            await ctx.reply("❌ Broadcast bekor qilindi", { reply_markup: { remove_keyboard: true } });
             await bot.api.sendMessage(BROADCAST_CHANNEL_ID, "❌ Broadcast bekor qilindi", { reply_parameters: { message_id: pending.channelMessageId } });
         }
     } catch (error) {
