@@ -8,7 +8,8 @@ import { sendErrorLog } from "@/services/log";
 export async function channelPost(ctx: Filter<Context, "channel_post">) {
     try {
         if (String(ctx.chat.id) !== BROADCAST_CHANNEL_ID) return;
-        if (ctx.channelPost.from && String(ctx.channelPost.from.id) !== BROADCAST_PRIVATE_CHAT_ID) return;
+        if (ctx.channelPost.author_signature === "Bot – O'zbek tilida multfilmlar") return;
+        if (ctx.channelPost.author_signature === "taxmin.uz") return;
 
         const messageId = ctx.channelPost.message_id;
         const chatId = String(ctx.chat.id);
